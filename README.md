@@ -5,6 +5,7 @@
 - This a simple drawing app that is developed from React + vite
 - This was also developed for autopmating CI/CD
 - Things used here are node Reactjs git Docker Kubernets minikube
+-helpfull to undersatnd and ease the development lifecycle.
 
 ## Run using docker
 
