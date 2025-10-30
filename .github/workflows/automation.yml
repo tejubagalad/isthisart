@@ -76,13 +76,13 @@ jobs:
           kubectl get svc
           kubectl describe svc isthisart-app-service
 
-      - name: Get Minikube Service URL
-        shell: powershell
-        run: |
-          Start-Job { minikube tunnel }
-          Start-Sleep -Seconds 5
-          $url = minikube service isthisart-app-service --url
-          echo "✅ Service available at: $url"
+      - name: Expose Minikube Service (via Port Forward)
+  shell: powershell
+  run: |
+    Start-Job { kubectl port-forward svc/isthisart-app-service 8080:80 --address 0.0.0.0 }
+    Start-Sleep -Seconds 10
+    Write-Output "✅ Service available at: http://localhost:8080"
+
 
 
 
