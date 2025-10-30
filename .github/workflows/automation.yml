@@ -76,9 +76,10 @@ jobs:
           kubectl get svc
           kubectl describe svc isthisart-app-service
 
-      # ✅ Safe non-blocking port-forward (replaces minikube service --url)
-      - name: Port-forward Minikube Service
-        shell: powershell
-        run: |
-          Start-Job { kubectl port-forward svc/isthisart-app-service 8080:80 --address 0.0.0.0 }
-          echo "✅ isthisart-app is available at: http://localhost:8080"
+  name: Get Minikube Service URL (Non-blocking)
+  shell: powershell
+  run: |
+    $minikubeIP = minikube ip
+    $nodePort = kubectl get svc isthisart-app-service -o jsonpath="{.spec.ports[0].nodePort}"
+    Write-Host "Service available at: http://$minikubeIP:$nodePort"
+
