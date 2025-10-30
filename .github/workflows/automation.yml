@@ -35,7 +35,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: [self-hosted, linux, x64] # Deploys on local machine with Minikube
+    runs-on: [self-hosted, Windows, X64] # Deploys on local machine with Minikube
 
     steps:
       - name: Checkout Repository
