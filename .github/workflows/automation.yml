@@ -42,33 +42,43 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Start Minikube
+        shell: powershell
         run: |
           minikube start --driver=docker
           minikube status
 
-      # ✅ Added step — align Docker with Minikube context (Windows PowerShell syntax)
+      # ✅ Configure Docker to use Minikube context (PowerShell syntax)
       - name: Configure Docker to use Minikube context
         shell: powershell
         run: |
           & minikube -p minikube docker-env --shell powershell | Invoke-Expression
           docker context use default
 
-      # ✅ Added step — load your image inside Minikube’s Docker
+      # ✅ Load your image inside Minikube’s Docker
       - name: Load Docker Image into Minikube
+        shell: powershell
         run: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/isthisart-app:latest
           minikube image load ${{ secrets.DOCKER_USERNAME }}/isthisart-app:latest
 
-      - name: Deploy to Minikube using k8s.yml
+      # ✅ Deploy to Minikube using Kubernetes manifest
+      - name: Deploy to Minikube
+        shell: powershell
         run: |
           kubectl apply -f k8s/k8s.yml
+          kubectl rollout status deployment/isthisart-app-deployment
           kubectl get pods -o wide
 
-      - name: Expose isthisart-app Service
+      # ✅ Expose and verify service
+      - name: Verify Service
+        shell: powershell
         run: |
           kubectl get svc
-          minikube service list
+          kubectl describe svc isthisart-app-service
 
-      - name: Get Minikube Service URL
+      # ✅ Safe non-blocking port-forward (replaces minikube service --url)
+      - name: Port-forward Minikube Service
+        shell: powershell
         run: |
-          minikube service isthisart-app-service --url
+          Start-Job { kubectl port-forward svc/isthisart-app-service 8080:80 --address 0.0.0.0 }
+          echo "✅ isthisart-app is available at: http://localhost:8080"
