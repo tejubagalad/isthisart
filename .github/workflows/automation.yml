@@ -46,19 +46,29 @@ jobs:
           minikube start --driver=docker
           minikube status
 
-      - name: Pull Docker Image from Docker Hub
-        run: docker pull ${{ secrets.DOCKER_USERNAME }}/isthisart-app:latest
+      # ✅ Added step — align Docker with Minikube context (Windows PowerShell syntax)
+      - name: Configure Docker to use Minikube context
+        shell: powershell
+        run: |
+          & minikube -p minikube docker-env --shell powershell | Invoke-Expression
+          docker context use default
+
+      # ✅ Added step — load your image inside Minikube’s Docker
+      - name: Load Docker Image into Minikube
+        run: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/isthisart-app:latest
+          minikube image load ${{ secrets.DOCKER_USERNAME }}/isthisart-app:latest
 
       - name: Deploy to Minikube using k8s.yml
         run: |
           kubectl apply -f k8s/k8s.yml
-          kubectl get pods
+          kubectl get pods -o wide
 
       - name: Expose isthisart-app Service
         run: |
+          kubectl get svc
           minikube service list
 
       - name: Get Minikube Service URL
         run: |
-
           minikube service isthisart-app-service --url
