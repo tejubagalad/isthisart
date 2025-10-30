@@ -79,8 +79,10 @@ jobs:
       - name: Get Minikube Service URL
         shell: powershell
         run: |
-          $ip = & minikube ip
-          $port = & kubectl get svc isthisart-app-service -o jsonpath="{.spec.ports[0].nodePort}"
-          Write-Output "✅ Service available at: http://$ip`:$port"
+          Start-Job { minikube tunnel }
+          Start-Sleep -Seconds 5
+          $url = minikube service isthisart-app-service --url
+          echo "✅ Service available at: $url"
+
 
 
